@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Checklist</string>
+    <string name="app_name">Чеклист</string>
     <string name="yes_bnt">Да</string>
     <string name="no_btn">Нет</string>
 </resources>

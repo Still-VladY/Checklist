@@ -8,6 +8,7 @@
 
     <ListView
         android:id="@+id/parent_list_org"
+        android:layout_margin="32dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
     </ListView>

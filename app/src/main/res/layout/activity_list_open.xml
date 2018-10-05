@@ -34,14 +34,16 @@
             android:layout_width="match_parent"
             android:layout_height="76dp"
             android:layout_weight="1"
-            android:text="@string/yes_bnt"/>
+            android:text="@string/yes_bnt"
+            android:onClick="clickYes"/>
 
         <Button
             android:id="@+id/noListBnt"
             android:layout_width="match_parent"
             android:layout_height="76dp"
             android:layout_weight="1"
-            android:text="@string/no_btn"/>
+            android:text="@string/no_btn"
+            android:onClick="clickNo"/>
 
     </LinearLayout>
 
