@@ -2,4 +2,6 @@
     <string name="app_name">Чеклист</string>
     <string name="yes_bnt">Да</string>
     <string name="no_btn">Нет</string>
+    <string name="setts">Настройки</string>
+    <string name="about">О приложении</string>
 </resources>
