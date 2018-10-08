@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Чеклист</string>
+    <string name="app_name">Чек-лист</string>
     <string name="yes_bnt">Да</string>
     <string name="no_btn">Нет</string>
     <string name="setts">Настройки</string>

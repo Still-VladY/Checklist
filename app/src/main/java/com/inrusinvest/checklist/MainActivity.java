@@ -11,11 +11,13 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 
+
 public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
         String[] mass = new String[] {"Какая-то организация 1", "Какая-то организация 2", "Какая-то организация 3"};
 
