@@ -30,8 +30,8 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
                 String xx = parent.getAdapter().getItem((int) id).toString();
-                Intent intent = new Intent(MainActivity.this, ListOpen.class);
-                intent.putExtra("company", xx);
+                Intent intent = new Intent(MainActivity.this, ChecklistGet.class);
+                //intent.putExtra("company", xx);
                 startActivity(intent);
             }
         });

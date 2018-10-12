@@ -22,9 +22,8 @@ import javax.net.ssl.HttpsURLConnection;
 
 public class GetMysql {
 
-
-    public void getIntroTextView (final TextView textView, final Integer sql, final String date1, final String date2,
-                                 final String cou, final String number) {
+    public void getQuestion (final String s, final Integer sql,
+                                 final String id_question, final String question) {
 
         @SuppressLint("StaticFieldLeak")
         class SendPostRequest extends AsyncTask<String, Void, String> {
@@ -40,9 +39,7 @@ public class GetMysql {
 
                     JSONObject postDataParams = new JSONObject();
                     postDataParams.put("sql", sql);
-                    postDataParams.put("start", date1);
-                    postDataParams.put("end", date2);
-                    postDataParams.put("getcount", cou);
+                    postDataParams.put("getidquest", id_question);
 
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     conn.setReadTimeout(15000);
@@ -94,7 +91,7 @@ public class GetMysql {
             protected void onPostExecute(String result) {
 
                 try {
-                    loadIntoTextView(result, textView, number);
+                    loadIntoTextView(result, s, question);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -127,14 +124,16 @@ public class GetMysql {
         return result.toString().trim();
     }
 
-    private void loadIntoTextView(String json, TextView textView, String number) throws JSONException {
+    private void loadIntoTextView(String json, String count, String question) throws JSONException {
         JSONArray jsonArray = new JSONArray(json);
 
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject obj = jsonArray.getJSONObject(i);
 
-            String count = obj.getString(number);
-            textView.append(count);
+            count = obj.getString(question);
+
+            //textView.append(count);
         }
+
     }
 }

@@ -1,6 +1,8 @@
 package com.inrusinvest.checklist;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -8,45 +10,57 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
-import java.util.Calendar;
-import java.util.Objects;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-public class ListOpen extends AppCompatActivity {
+public class ListOpen extends Activity {
 
     AlertDialog.Builder alertDialog;
-    ImageView imageView;
     Uri outputFileUri;
+    ImageView imageView;
+    View page;
     static final int REQUEST_CODE_PERMISSION_READ = 1;
     static final int REQUEST_IMAGE_CAPTURE = 1;
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_list_open);
 
-        TextView tv = findViewById(R.id.text_organization);
-        //ImageView imageView = (ImageView)findViewById(R.id.imageView);
+        final List<View> pages = new ArrayList<View>();
+
+        addText("Вопросик");
+        pages.add(page);
+        addText("Еще вопросик");
+        pages.add(page);
+
+
+        QuestionAdapter questionAdapter = new QuestionAdapter(pages);
+        ViewPager viewPager = new ViewPager(this);
+        viewPager.setAdapter(questionAdapter);
+        viewPager.setCurrentItem(0);
+        setContentView(viewPager);
+
+
+        /*TextView tv = findViewById(R.id.text_organization);
         Bundle arg = getIntent().getExtras();
         if (arg != null) {
             String getcomp = Objects.requireNonNull(arg.get("company")).toString();
             tv.setText(getcomp);
-        }
+        }*/
 
         alertDialog = new AlertDialog.Builder(ListOpen.this);
         alertDialog.setTitle("Продолжить?");
@@ -68,7 +82,7 @@ public class ListOpen extends AppCompatActivity {
                     ActivityCompat.requestPermissions(ListOpen.this, new String[]{Manifest.permission.CAMERA},
                             REQUEST_CODE_PERMISSION_READ);
                 }
-                }
+            }
         });
         alertDialog.setCancelable(true);
         alertDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
@@ -77,14 +91,24 @@ public class ListOpen extends AppCompatActivity {
 
             }
         });
+
     }
 
-    public void clickNo (View v) {
+    private void addText(String s) {
+        LayoutInflater inflater = LayoutInflater.from(this);
+
+        page = inflater.inflate(R.layout.fragment_question, null);
+        TextView textView = (TextView) page.findViewById(R.id.text_question);
+        imageView = (ImageView) page.findViewById(R.id.image_question);
+        textView.setText(s);
+    }
+
+    public void clickNo(View v) {
         alertDialog.show();
 
     }
 
-    public void clickYes (View v) {
+    public void clickYes(View v) {
 
     }
 
@@ -95,14 +119,20 @@ public class ListOpen extends AppCompatActivity {
         outputFileUri = Uri.fromFile(file);
         intent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
         startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
+        try {
+            Bitmap img = MediaStore.Images.Media.getBitmap(this.getContentResolver(), outputFileUri);
+            imageView.setImageBitmap(img);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             int permissionStatus = ContextCompat.checkSelfPermission(ListOpen.this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
             if (permissionStatus == PackageManager.PERMISSION_GRANTED) {
                 Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-
                 mediaScanIntent.setData(outputFileUri);
                 this.sendBroadcast(mediaScanIntent);
             } else {
