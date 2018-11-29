@@ -17,7 +17,14 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
+            android:name=".CompanyGet"
+            android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".ListOpen"
+            android:screenOrientation="portrait" />
+        <activity android:name=".ChecklistGet" />
+        <activity
+            android:name=".FireBaseOaut"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,10 +32,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".ListOpen"
-            android:screenOrientation="portrait" />
-        <activity android:name=".ChecklistGet"></activity>
+        <activity android:name=".SettsActivity"></activity>
     </application>
 
 </manifest>

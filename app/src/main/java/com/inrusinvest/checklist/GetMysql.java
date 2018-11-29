@@ -2,10 +2,7 @@ package com.inrusinvest.checklist;
 
 import android.annotation.SuppressLint;
 import android.os.AsyncTask;
-import android.widget.TextView;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -23,7 +20,7 @@ import javax.net.ssl.HttpsURLConnection;
 public class GetMysql {
 
     public void getQuestion (final String s, final Integer sql,
-                                 final String id_question, final String question) {
+                                 final String id_question) {
 
         @SuppressLint("StaticFieldLeak")
         class SendPostRequest extends AsyncTask<String, Void, String> {
@@ -90,11 +87,6 @@ public class GetMysql {
             @Override
             protected void onPostExecute(String result) {
 
-                try {
-                    loadIntoTextView(result, s, question);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
             }
         }
         SendPostRequest getJSON = new SendPostRequest();
@@ -122,18 +114,5 @@ public class GetMysql {
             result.append(URLEncoder.encode(value.toString(), "UTF-8"));
         }
         return result.toString().trim();
-    }
-
-    private void loadIntoTextView(String json, String count, String question) throws JSONException {
-        JSONArray jsonArray = new JSONArray(json);
-
-        for (int i = 0; i < jsonArray.length(); i++) {
-            JSONObject obj = jsonArray.getJSONObject(i);
-
-            count = obj.getString(question);
-
-            //textView.append(count);
-        }
-
     }
 }

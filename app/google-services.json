@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "1024139544056",
+    "firebase_url": "https://checklist-282a3.firebaseio.com",
+    "project_id": "checklist-282a3",
+    "storage_bucket": "checklist-282a3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1024139544056:android:1755093b922cd180",
+        "android_client_info": {
+          "package_name": "com.inrusinvest.checklist"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1024139544056-oipbudm6sjaduddnah3r2tl0hb1uk2mn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.inrusinvest.checklist",
+            "certificate_hash": "eb81d811afa3256148969e2689a6eceddc27cfc8"
+          }
+        },
+        {
+          "client_id": "1024139544056-l6s6h30chvnl98jov3k09qjtlppg198u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBb9gh9R56ectiMCUMKLLgv6psi_g3d85g"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1024139544056-l6s6h30chvnl98jov3k09qjtlppg198u.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

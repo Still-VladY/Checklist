@@ -6,6 +6,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListAdapter;
@@ -13,127 +15,125 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
+import org.apache.http.NameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
-public class ChecklistGet extends AppCompatActivity {
 
-    PDialog pDialog = new PDialog();
+public class CompanyGet extends AppCompatActivity {
 
     JSONParser jsonParser = new JSONParser();
 
-    ArrayList<HashMap<String, String>> checkList;
+    ArrayList<HashMap<String, String>> companyList;
 
     private static final String TAG_SUCCESS = "success";
-    private static final String TAG_CHECKLIST = "company";
+    private static final String TAG_COMPANY = "company";
     private static final String TAG_PID = "id";
-    private static final String TAG_CHECKLIST_NAME = "checklist_name";
-    private static final String TAG_STATUS = "status_check";
+    private static final String TAG_COMPANY_NAME = "company_name";
+    private static final String TAG_STATUS = "status_comp";
     private static final String TAG_MESSAGE = "message";
-    private static final String TAG_ID_CHECKLIST = "id_checklist";
 
     JSONArray company = null;
+    PDialog pDialog = new PDialog();
 
     ListView lv;
-
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
 
-        checkList = new ArrayList<HashMap<String, String>>();
+        companyList = new ArrayList<HashMap<String, String>>();
 
         lv = findViewById(R.id.parent_list_org);
-        new GetChecklist().execute();
+        new GetCompany().execute();
 
     }
 
     @SuppressLint("StaticFieldLeak")
-    class GetChecklist extends AsyncTask<String, String, String> {
+    class GetCompany extends AsyncTask<String, String, String> {
+
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            pDialog.run(ChecklistGet.this);
+            pDialog.run(CompanyGet.this);
         }
 
 
-
         protected String doInBackground(String... args) {
+            // Будет хранить параметры
+            List<NameValuePair> params = new ArrayList<NameValuePair>();
             // Создаем новый HashMap
-            HashMap<String, String> map = new HashMap<>();
-
-            String get_comp_id = null;
-            Bundle arg = getIntent().getExtras();
-            if (arg != null) {
-                get_comp_id = arg.getString("company_id");
-                //System.out.println("Ид выбранной компании - " + get_comp_id);
-            }
-            map.put("id", get_comp_id);
+            HashMap<String, String> map = new HashMap<String, String>();
             // получаем JSON строк с URL
-            String url_get_checklist = "http://46.149.225.24:8081/checklist/get_checklist.php";
-            JSONObject json = jsonParser.makeHttpRequest(url_get_checklist, "GET", map);
+            String url_get_company = "http://46.149.225.24:8081/checklist/get_company.php";
+            JSONObject json = jsonParser.makeHttpRequest(url_get_company, "GET", map);
 
 
-           // Log.d("All Checklists: ", json.toString());
+            Log.d("All Companies: ", json.toString());
 
             try {
                 // Получаем SUCCESS тег для проверки статуса ответа сервера
                 int success = json.getInt(TAG_SUCCESS);
 
-
-
                 if (success == 1) {
+                    // продукт найден
                     // Получаем масив
-                    company = json.getJSONArray(TAG_CHECKLIST);
+                    company = json.getJSONArray(TAG_COMPANY);
+
                     // перебор
                     for (int i = 0; i < company.length(); i++) {
-
                         JSONObject c = company.getJSONObject(i);
                         String status = c.getString(TAG_STATUS);
-                        //System.out.println("Статус - " + status);
+                        //System.out.println("Статус - "+status);
 
                         if (status.equals("1")) {
                             // Сохраняем каждый json элемент в переменную
-                            String id = c.getString(TAG_ID_CHECKLIST);
-                            String name = c.getString(TAG_CHECKLIST_NAME);
-                            Log.d("Чеклисты", name);
+                            String id = c.getString(TAG_PID);
+                            String name = c.getString(TAG_COMPANY_NAME);
+                            //System.out.print(name + "\n");
+
                             HashMap<String, String> map2list = new HashMap<String, String>();
 
                             // добавляем каждый елемент в HashMap ключ => значение
-
-                            map2list.put(TAG_CHECKLIST_NAME, name);
                             map2list.put(TAG_PID, id);
+                            map2list.put(TAG_COMPANY_NAME, name);
+
                             // добавляем HashList в ArrayList
-                            checkList.add(map2list);
+                            companyList.add(map2list);
 
                             lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                                 public void onItemClick(AdapterView<?> parent, View view,
                                                         int position, long id) {
+
                                     String pid = ((TextView) view.findViewById(R.id.pid)).getText()
                                             .toString();
-                                    Log.d("Выбранный id чеклиста", pid);
-                                    Intent intent = new Intent(ChecklistGet.this, ListOpen.class);
-                                    intent.putExtra("checklist_id", pid);
+                                    System.out.println(pid);
+                                    Intent intent = new Intent(CompanyGet.this, ChecklistGet.class);
+                                    intent.putExtra("company_id", pid);
                                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                     startActivity(intent);
+
                                 }
                             });
-                        }
+
+                        } //else //Toast.makeText(getApplicationContext(), "Нет доступных организаций", Toast.LENGTH_SHORT).show();
                     }
                 } else {
                     HashMap<String, String> map2list = new HashMap<String, String>();
 
                     // добавляем каждый елемент в HashMap ключ => значение
                     String name = json.getString(TAG_MESSAGE);
-                    map2list.put(TAG_CHECKLIST_NAME, name);
+                    map2list.put(TAG_COMPANY_NAME, name);
                     // добавляем HashList в ArrayList
-                    checkList.add(map2list);
+                    companyList.add(map2list);
                 }
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -149,14 +149,44 @@ public class ChecklistGet extends AppCompatActivity {
                 public void run() {
 
                     ListAdapter adapter = new SimpleAdapter(
-                            ChecklistGet.this, checkList,
+                            CompanyGet.this, companyList,
                             R.layout.list_item, new String[]{TAG_PID,
-                            TAG_CHECKLIST_NAME},
+                            TAG_COMPANY_NAME},
                             new int[]{R.id.pid, R.id.name});
                     // обновляем listview
                     lv.setAdapter(adapter);
                 }
             });
+
         }
+    }
+
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.action_settings:
+                Intent intent = new Intent(this, SettsActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                return true;
+            case R.id.action_about:
+
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    public void onDestroy() {
+        moveTaskToBack(true);
+
+        super.onDestroy();
+
+        System.runFinalizersOnExit(true);
+        System.exit(0);
     }
 }

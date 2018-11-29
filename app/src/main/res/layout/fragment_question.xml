@@ -7,6 +7,11 @@
     android:weightSum="6"
     android:orientation="vertical">
 
+    <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/pid_qu"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
     <TextView
         android:id="@+id/text_question"
         android:layout_width="wrap_content"
@@ -32,7 +37,7 @@
             android:layout_height="76dp"
             android:layout_weight="1"
             android:text="@string/yes_bnt"
-            android:onClick="clickYes"/>
+            android:onClick="yesClick"/>
 
         <Button
             android:id="@+id/noListBnt"
@@ -40,7 +45,7 @@
             android:layout_height="76dp"
             android:layout_weight="1"
             android:text="@string/no_btn"
-            android:onClick="clickNo"/>
+            android:onClick="noClick"/>
 
     </LinearLayout>
 
