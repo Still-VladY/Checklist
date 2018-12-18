@@ -14,10 +14,6 @@ public class QuestionAdapter extends PagerAdapter {
         this.pages = pages;
     }
 
-    QuestionAdapter() {
-
-    }
-
     @NonNull
     @Override
     public Object instantiateItem(@NonNull View collection, int position) {

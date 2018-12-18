@@ -46,6 +46,7 @@ public class FireBaseOaut extends BaseActivity implements
     private static final String TAG_COMPANY_NAME = "company_name";
     private static final String TAG_STATUS = "status_comp";
     private static final String TAG_MESSAGE = "message";
+    private static final String url_get_company = "http://46.149.225.24:8081/checklist/get_user.php";
 
 
     private static final String TAG = "EmailPassword";
@@ -53,6 +54,7 @@ public class FireBaseOaut extends BaseActivity implements
     private TextView mDetailTextView;
     private EditText mEmailField;
     private EditText mPasswordField;
+
 
     private FirebaseAuth mAuth;
 
@@ -68,7 +70,7 @@ public class FireBaseOaut extends BaseActivity implements
 
         findViewById(R.id.emailSignInButton).setOnClickListener(this);  //определяем кнопки, добавляем слушателей
         findViewById(R.id.emailCreateAccountButton).setOnClickListener(this);
-        findViewById(R.id.signOutButton).setOnClickListener(this);
+        //findViewById(R.id.signOutButton).setOnClickListener(this);
 
         mAuth = FirebaseAuth.getInstance();   //инициализируем авторизацию
     }
@@ -84,7 +86,7 @@ public class FireBaseOaut extends BaseActivity implements
 
     private void createAccount(String email, String password) { //Проверка на заполненность полей
         Log.d(TAG, "createAccount:" + email);
-        if (!validateForm()) {
+        if (!validateRegForm()) {
             return;
         }
 
@@ -98,15 +100,15 @@ public class FireBaseOaut extends BaseActivity implements
                         if (task.isSuccessful()) {
                             Log.d(TAG, "createUserWithEmail:success");
                             FirebaseUser user = mAuth.getCurrentUser();
-                            mStatusTextView.setText(getString(R.string.emailpassword_status_fmt,
+                            updateUI(user);
+                            /*mStatusTextView.setText(getString(R.string.emailpassword_status_fmt,
                                     user.getEmail()));
 
                             findViewById(R.id.emailPasswordButtons).setVisibility(View.GONE);
                             findViewById(R.id.emailPasswordFields).setVisibility(View.GONE);
-                            findViewById(R.id.signedInButtons).setVisibility(View.VISIBLE);
+                            findViewById(R.id.signedInButtons).setVisibility(View.VISIBLE);*/
 
                         } else {
-                            // If sign in fails, display a message to the user.
                             Log.w(TAG, "createUserWithEmail:failure", task.getException());
                             Toast.makeText(FireBaseOaut.this, "Ошибка регистрации",
                                     Toast.LENGTH_SHORT).show();
@@ -116,6 +118,7 @@ public class FireBaseOaut extends BaseActivity implements
                         hideProgressDialog();
                     }
                 });
+
     }
 
     private void signIn(String email, String password) {
@@ -147,12 +150,8 @@ public class FireBaseOaut extends BaseActivity implements
                 });
     }
 
-    private void signOut() {  //метод выхода
-        mAuth.signOut();
-        updateUI(null);
-    }
 
-    private boolean validateForm() {  //проверка на заполненность полей
+    private boolean validateForm() {  //проверка на заполненность полей при авторизации
         boolean valid = true;
 
         String email = mEmailField.getText().toString();
@@ -166,6 +165,28 @@ public class FireBaseOaut extends BaseActivity implements
         String password = mPasswordField.getText().toString();
         if (TextUtils.isEmpty(password)) {
             mPasswordField.setError("Введите пароль");
+            valid = false;
+        } else {
+            mPasswordField.setError(null);
+        }
+
+        return valid;
+    }
+
+    private boolean validateRegForm() {  //проверка на заполненность полей при регистрации
+        boolean valid = true;
+
+        String email = mEmailField.getText().toString();
+        if (TextUtils.isEmpty(email)) {
+            mEmailField.setError("Введите вашу почту");
+            valid = false;
+        } else {
+            mEmailField.setError(null);
+        }
+
+        String password = mPasswordField.getText().toString();
+        if (TextUtils.isEmpty(password)) {
+            mPasswordField.setError("Придумайте пароль");
             valid = false;
         } else {
             mPasswordField.setError(null);
@@ -188,15 +209,20 @@ public class FireBaseOaut extends BaseActivity implements
                     if (val != null) {
                         hideProgressDialog();
                         Intent intent = new Intent(getApplicationContext(), CompanyGet.class);
+                        intent.putExtra("uid_user", Objects.requireNonNull(mAuth.getCurrentUser()).getUid());
                         startActivity(intent);
                     } else {
-                        FirebaseUser user = mAuth.getCurrentUser();
+                        hideProgressDialog();
+                        Intent intent = new Intent(getApplicationContext(), NewUserActivity.class);
+                        startActivity(intent);
+                        /*FirebaseUser user = mAuth.getCurrentUser();
                         mStatusTextView.setText(getString(R.string.emailpassword_status_fmt,
                                 user.getEmail()));
 
                         findViewById(R.id.emailPasswordButtons).setVisibility(View.GONE);
                         findViewById(R.id.emailPasswordFields).setVisibility(View.GONE);
                         findViewById(R.id.signedInButtons).setVisibility(View.VISIBLE);
+                        */
                     }
                 }
 
@@ -217,15 +243,15 @@ public class FireBaseOaut extends BaseActivity implements
 
     }
 
+
     @Override
     public void onClick(View v) {
         int i = v.getId();
         if (i == R.id.emailCreateAccountButton) {
             createAccount(mEmailField.getText().toString(), mPasswordField.getText().toString());
+            //createAccount(crMailField.getText().toString(), crPasswordField.getText().toString());
         } else if (i == R.id.emailSignInButton) {
             signIn(mEmailField.getText().toString(), mPasswordField.getText().toString());
-        } else if (i == R.id.signOutButton) {
-            signOut();
         }
     }
 
@@ -249,7 +275,7 @@ public class FireBaseOaut extends BaseActivity implements
             Log.d("uid parsing:", Objects.requireNonNull(mAuth.getCurrentUser()).getUid());
 
             // получаем JSON строк с URL
-            String url_get_company = "http://46.149.225.24:8081/checklist/get_user.php";
+
             JSONObject json = jsonParser.makeHttpRequest(url_get_company, "GET", map);
 
 
@@ -323,7 +349,6 @@ public class FireBaseOaut extends BaseActivity implements
                     lv.setAdapter(adapter);
                 }
             });*/
-
         }
     }
 }

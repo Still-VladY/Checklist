@@ -118,7 +118,6 @@
             android:weightSum="1.0">
 
             <Button
-                android:id="@+id/signOutButton"
                 style="@style/Widget.AppCompat.Button.Colored"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

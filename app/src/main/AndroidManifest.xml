@@ -18,7 +18,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".CompanyGet"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ListOpen"
             android:screenOrientation="portrait" />
@@ -32,7 +32,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SettsActivity"></activity>
+        <activity android:name=".SettsActivity" />
+        <activity android:name=".NewUserActivity"></activity>
+        <activity android:name=".Question_open"></activity>
     </application>
 
 </manifest>

@@ -29,14 +29,16 @@ public class ChecklistGet extends AppCompatActivity {
     ArrayList<HashMap<String, String>> checkList;
 
     private static final String TAG_SUCCESS = "success";
-    private static final String TAG_CHECKLIST = "company";
+    private static final String TAG_CHECKLIST = "checklist";
     private static final String TAG_PID = "id";
     private static final String TAG_CHECKLIST_NAME = "checklist_name";
     private static final String TAG_STATUS = "status_check";
     private static final String TAG_MESSAGE = "message";
     private static final String TAG_ID_CHECKLIST = "id_checklist";
+    private static final String url_get_checklist = "http://46.149.225.24:8081/checklist/get_checklist.php";
+    //private static final String url_get_checklist = "http://192.168.100.23:8081/checklist/get_checklist.php";
 
-    JSONArray company = null;
+    JSONArray checklist = null;
 
     ListView lv;
 
@@ -68,14 +70,22 @@ public class ChecklistGet extends AppCompatActivity {
             HashMap<String, String> map = new HashMap<>();
 
             String get_comp_id = null;
+            String get_uid = null;
             Bundle arg = getIntent().getExtras();
             if (arg != null) {
                 get_comp_id = arg.getString("company_id");
+                get_uid = arg.getString("uid_user");
                 //System.out.println("Ид выбранной компании - " + get_comp_id);
+
+                map.put("id", get_comp_id);
+                map.put("uid", "\'"+get_uid+"\'");
             }
-            map.put("id", get_comp_id);
+
+            final String put_uid = get_uid;
+            final String put_comp_id = get_comp_id;
+
             // получаем JSON строк с URL
-            String url_get_checklist = "http://46.149.225.24:8081/checklist/get_checklist.php";
+
             JSONObject json = jsonParser.makeHttpRequest(url_get_checklist, "GET", map);
 
 
@@ -89,11 +99,11 @@ public class ChecklistGet extends AppCompatActivity {
 
                 if (success == 1) {
                     // Получаем масив
-                    company = json.getJSONArray(TAG_CHECKLIST);
+                    checklist = json.getJSONArray(TAG_CHECKLIST);
                     // перебор
-                    for (int i = 0; i < company.length(); i++) {
+                    for (int i = 0; i < checklist.length(); i++) {
 
-                        JSONObject c = company.getJSONObject(i);
+                        JSONObject c = checklist.getJSONObject(i);
                         String status = c.getString(TAG_STATUS);
                         //System.out.println("Статус - " + status);
 
@@ -119,6 +129,8 @@ public class ChecklistGet extends AppCompatActivity {
                                     Log.d("Выбранный id чеклиста", pid);
                                     Intent intent = new Intent(ChecklistGet.this, ListOpen.class);
                                     intent.putExtra("checklist_id", pid);
+                                    intent.putExtra("uid_user", put_uid);
+                                    intent.putExtra("company_id", put_comp_id);
                                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                     startActivity(intent);
                                 }

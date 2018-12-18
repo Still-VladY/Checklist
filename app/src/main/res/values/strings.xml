@@ -52,4 +52,9 @@
 
     <string name="id_fmt">User ID: %s</string>
     <string name="email_fmt">Email: %s</string>
+
+    <string name="get_name">Ваше имя:</string>
+    <string name="get_family">Ваша фамилия:</string>
+    <string name="get_middle">Ваше отчество:</string>
+    <string name="new_acc">Регистрация нового пользователя</string>
 </resources>

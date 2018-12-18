@@ -15,14 +15,12 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
-import org.apache.http.NameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 
 public class CompanyGet extends AppCompatActivity {
@@ -37,11 +35,15 @@ public class CompanyGet extends AppCompatActivity {
     private static final String TAG_COMPANY_NAME = "company_name";
     private static final String TAG_STATUS = "status_comp";
     private static final String TAG_MESSAGE = "message";
+    private static final String url_get_company = "http://46.149.225.24:8081/checklist/get_company.php";
+    //private static final String url_get_company = "http://192.168.100.23:8081/checklist/get_company.php";
 
     JSONArray company = null;
     PDialog pDialog = new PDialog();
 
     ListView lv;
+
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -66,15 +68,25 @@ public class CompanyGet extends AppCompatActivity {
 
 
         protected String doInBackground(String... args) {
-            // Будет хранить параметры
-            List<NameValuePair> params = new ArrayList<NameValuePair>();
-            // Создаем новый HashMap
+
             HashMap<String, String> map = new HashMap<String, String>();
-            // получаем JSON строк с URL
-            String url_get_company = "http://46.149.225.24:8081/checklist/get_company.php";
+
+            String get_uid = null;
+
+            Bundle arg = getIntent().getExtras();
+
+            if (arg != null) {
+                get_uid = arg.getString("uid_user");   // ПОЛУЧИЛ UID, далее в чеклист, далее в вопросы
+                map.put("uid", "\'"+get_uid+"\'");
+            }
+
+            final String put_uid = get_uid;
+
             JSONObject json = jsonParser.makeHttpRequest(url_get_company, "GET", map);
 
-
+            if (get_uid != null) {
+                Log.d("uid: ", get_uid);
+            }
             Log.d("All Companies: ", json.toString());
 
             try {
@@ -116,6 +128,7 @@ public class CompanyGet extends AppCompatActivity {
                                     System.out.println(pid);
                                     Intent intent = new Intent(CompanyGet.this, ChecklistGet.class);
                                     intent.putExtra("company_id", pid);
+                                    intent.putExtra("uid_user", put_uid);
                                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                     startActivity(intent);
 
