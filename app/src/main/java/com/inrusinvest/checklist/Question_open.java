@@ -59,13 +59,19 @@ public class Question_open extends AppCompatActivity {
     private static final String TAG_PHOTO = "photo";
     private static final String TAG_MESSAGE = "message";
     private static final String url_get_checklist = "http://46.149.225.24:8081/checklist/question_open.php";
-    private static final String url_put_checklist = "http://46.149.225.24:8081/checklist/";
+    private static final String url_answer = "http://46.149.225.24:8081/checklist/put_answer.php";
 
-    JSONArray question = null;
 
-    TextView tv;
+    private JSONArray question = null;
 
-    String photo;
+    private TextView tv;
+
+    private String photo;
+    private String answer;
+    private String get_ch_id;
+    private String get_uid;
+    private String get_comp_id;
+    private String get_qu_id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +92,8 @@ public class Question_open extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 Toast.makeText(Question_open.this, "Далее... Записываем ответ, отсылаем фото...", Toast.LENGTH_SHORT).show();
+
+                goToQuestions();
             }
         });
         alertDialog.setNegativeButton(" Фото", new DialogInterface.OnClickListener() {
@@ -155,12 +163,12 @@ public class Question_open extends AppCompatActivity {
             // Создаем новый HashMap
             HashMap<String, String> map = new HashMap<>();
 
-            String get_qu_id;
-
-
             Bundle arg = getIntent().getExtras();
             if (arg != null) {
                 get_qu_id = arg.getString("id_question");
+                get_uid = arg.getString("user_uid");
+                get_ch_id = arg.getString("checklist_id");
+                get_comp_id = arg.getString("company_id");
                 map.put("id", get_qu_id);
             }
 
@@ -189,7 +197,6 @@ public class Question_open extends AppCompatActivity {
                         if (status.equals("1")) {
                             // Сохраняем каждый json элемент в переменную
                             //String id = c.getString(TAG_PID_CH);
-                            String id = c.getString(TAG_PID);
                             String name = c.getString(TAG_QUESTION_TEXT);
                             String photoUrl = c.getString(TAG_PHOTO);
                             if (!photoUrl.equals("null")) {
@@ -212,12 +219,15 @@ public class Question_open extends AppCompatActivity {
                             btn1.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {  //если 0 - не нужно, 1 - нет - нужно, да - не нужно, 2 - нет - не нужно, да - нужно, 3 - нет - нужно, да - нужно
+                                    answer = "1";
                                     switch (photo) {
                                         case "0":
-                                            alertDialog.show();
+                                            new GetAnswer().execute();
+                                            goToQuestions();
                                             break;
                                         case "1":
-                                            alertDialog.show();
+                                            new GetAnswer().execute();
+                                            goToQuestions();
                                             break;
                                         case "2":
                                             alertDialog.show();
@@ -232,15 +242,18 @@ public class Question_open extends AppCompatActivity {
                             btn2.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
+                                    answer = "0";
                                     switch (photo) {
                                         case "0":
-                                            alertDialog.show();
+                                            new GetAnswer().execute();
+                                            goToQuestions();
                                             break;
                                         case "1":
                                             alertDialog.show();
                                             break;
                                         case "2":
-                                            alertDialog.show();
+                                            new GetAnswer().execute();
+                                            goToQuestions();
                                             break;
                                         case "3":
                                             alertDialog.show();
@@ -251,7 +264,6 @@ public class Question_open extends AppCompatActivity {
                         }
                     }
                 } else {
-                    HashMap<String, String> map2list = new HashMap<String, String>();
 
                     // добавляем каждый елемент в HashMap ключ => значение
                     String name = json.getString(TAG_MESSAGE);
@@ -273,7 +285,7 @@ public class Question_open extends AppCompatActivity {
 
 
     @SuppressLint("StaticFieldLeak")
-    class PutQuestionAnswerWinhoutPhoto extends AsyncTask<String, String, String> {
+    class GetAnswer extends AsyncTask<String, String, String> {
 
         @Override
         protected void onPreExecute() {
@@ -286,26 +298,22 @@ public class Question_open extends AppCompatActivity {
             // Создаем новый HashMap
             HashMap<String, String> map = new HashMap<>();
 
-            String get_qu_id;
-            String get_ch_id;
+            map.put("uid", "\'"+get_uid+"\'");
+            map.put("id_ch", "\'"+get_ch_id+"\'");
+            map.put("comp_id", "\'"+get_comp_id+"\'");
+            map.put("id_qu", "\'"+get_qu_id+"\'");
+            map.put("answer", answer);
 
-            Bundle arg = getIntent().getExtras();
-            if (arg != null) {
-                get_qu_id = arg.getString("id_question");
-                get_ch_id = arg.getString("checklist_id");
+            Log.d("Чеклист Ран ид юзера: ", get_uid);
+            Log.d("Чеклист Ран ид комп: ", get_comp_id);
+            Log.d("Чеклист Ран ид чек", get_ch_id);
 
-                map.put("id", get_qu_id);
-                map.put("ch_id", get_ch_id);
-                map.put("")
-            }
 
             // получаем JSON строк с URL
 
-            JSONObject json = jsonParser.makeHttpRequest(url_put_checklist, "GET", map);
-
+            JSONObject json = jsonParser.makeHttpRequest(url_answer, "GET", map);
 
             //Log.d("Все вопросы: ", json.toString());
-
 
             try {
                 // Получаем SUCCESS тег для проверки статуса ответа сервера
@@ -327,13 +335,10 @@ public class Question_open extends AppCompatActivity {
                         }
                     }
                 } else {
-                    HashMap<String, String> map2list = new HashMap<String, String>();
-
-                    // добавляем каждый елемент в HashMap ключ => значение
-                    String name = json.getString(TAG_MESSAGE);
-                    tv.setText(name);
+                    Log.d("ОШИБКА", "ОШИБКА, не 1");
                 }
             } catch (JSONException e) {
+                Log.d("ОШИБКА", "ОШИБКА");
                 e.printStackTrace();
             }
 
@@ -346,4 +351,12 @@ public class Question_open extends AppCompatActivity {
             pDialog.end();
         }
     }
-}
+
+    private void goToQuestions () {
+        Intent intent = new Intent(Question_open.this, ListOpen.class);
+        intent.putExtra("checklist_id", get_ch_id);
+        intent.putExtra("uid_user", get_uid);
+        intent.putExtra("company_id", get_comp_id);
+        startActivity(intent);
+    }
+ }
