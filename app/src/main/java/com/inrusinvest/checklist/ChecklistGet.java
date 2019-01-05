@@ -32,7 +32,6 @@ public class ChecklistGet extends AppCompatActivity {
     private static final String TAG_CHECKLIST = "checklist";
     private static final String TAG_PID = "id";
     private static final String TAG_CHECKLIST_NAME = "checklist_name";
-    private static final String TAG_STATUS = "status_check";
     private static final String TAG_MESSAGE = "message";
     private static final String TAG_ID_CHECKLIST = "id_checklist";
     private static final String url_get_checklist = "http://46.149.225.24:8081/checklist/get_checklist.php";
@@ -64,7 +63,6 @@ public class ChecklistGet extends AppCompatActivity {
         }
 
 
-
         protected String doInBackground(String... args) {
             // Создаем новый HashMap
             HashMap<String, String> map = new HashMap<>();
@@ -78,7 +76,7 @@ public class ChecklistGet extends AppCompatActivity {
                 //System.out.println("Ид выбранной компании - " + get_comp_id);
 
                 map.put("id", get_comp_id);
-                map.put("uid", "\'"+get_uid+"\'");
+                map.put("uid", "\'" + get_uid + "\'");
             }
 
             final String put_uid = get_uid;
@@ -89,12 +87,11 @@ public class ChecklistGet extends AppCompatActivity {
             JSONObject json = jsonParser.makeHttpRequest(url_get_checklist, "GET", map);
 
 
-           // Log.d("All Checklists: ", json.toString());
+            // Log.d("All Checklists: ", json.toString());
 
             try {
                 // Получаем SUCCESS тег для проверки статуса ответа сервера
                 int success = json.getInt(TAG_SUCCESS);
-
 
 
                 if (success == 1) {
@@ -104,38 +101,36 @@ public class ChecklistGet extends AppCompatActivity {
                     for (int i = 0; i < checklist.length(); i++) {
 
                         JSONObject c = checklist.getJSONObject(i);
-                        String status = c.getString(TAG_STATUS);
                         //System.out.println("Статус - " + status);
 
-                        if (status.equals("1")) {
-                            // Сохраняем каждый json элемент в переменную
-                            String id = c.getString(TAG_ID_CHECKLIST);
-                            String name = c.getString(TAG_CHECKLIST_NAME);
-                            Log.d("Чеклисты", name);
-                            HashMap<String, String> map2list = new HashMap<String, String>();
+                        // Сохраняем каждый json элемент в переменную
+                        String id = c.getString(TAG_ID_CHECKLIST);
+                        String name = c.getString(TAG_CHECKLIST_NAME);
+                        Log.d("Чеклисты", name);
+                        HashMap<String, String> map2list = new HashMap<String, String>();
 
-                            // добавляем каждый елемент в HashMap ключ => значение
+                        // добавляем каждый елемент в HashMap ключ => значение
 
-                            map2list.put(TAG_CHECKLIST_NAME, name);
-                            map2list.put(TAG_PID, id);
-                            // добавляем HashList в ArrayList
-                            checkList.add(map2list);
+                        map2list.put(TAG_CHECKLIST_NAME, name);
+                        map2list.put(TAG_PID, id);
+                        // добавляем HashList в ArrayList
+                        checkList.add(map2list);
 
-                            lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                                public void onItemClick(AdapterView<?> parent, View view,
-                                                        int position, long id) {
-                                    String pid = ((TextView) view.findViewById(R.id.pid)).getText()
-                                            .toString();
-                                    Log.d("Выбранный id чеклиста", pid);
-                                    Intent intent = new Intent(ChecklistGet.this, ListOpen.class);
-                                    intent.putExtra("checklist_id", pid);
-                                    intent.putExtra("uid_user", put_uid);
-                                    intent.putExtra("company_id", put_comp_id);
-                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                    startActivity(intent);
-                                }
-                            });
-                        }
+                        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                            public void onItemClick(AdapterView<?> parent, View view,
+                                                    int position, long id) {
+                                String pid = ((TextView) view.findViewById(R.id.pid)).getText()
+                                        .toString();
+                                Log.d("Выбранный id чеклиста", pid);
+                                Intent intent = new Intent(ChecklistGet.this, ListOpen.class);
+                                intent.putExtra("checklist_id", pid);
+                                intent.putExtra("uid_user", put_uid);
+                                intent.putExtra("company_id", put_comp_id);
+                                //intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                startActivity(intent);
+                            }
+                        });
+
                     }
                 } else {
                     HashMap<String, String> map2list = new HashMap<String, String>();

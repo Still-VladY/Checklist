@@ -23,11 +23,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -37,16 +35,9 @@ public class FireBaseOaut extends BaseActivity implements
 
 
     JSONParser jsonParser = new JSONParser();
-    ArrayList<HashMap<String, String>> userList;
-    JSONArray userArray = null;
     PDialog pDialog = new PDialog();
     private static final String TAG_SUCCESS = "success";
-    private static final String TAG_COMPANY = "company";
-    private static final String TAG_PID = "id";
-    private static final String TAG_COMPANY_NAME = "company_name";
-    private static final String TAG_STATUS = "status_comp";
-    private static final String TAG_MESSAGE = "message";
-    private static final String url_get_company = "http://46.149.225.24:8081/checklist/get_user.php";
+    private static final String url_get_user = "http://46.149.225.24:8081/checklist/get_user.php";
 
 
     private static final String TAG = "EmailPassword";
@@ -205,7 +196,9 @@ public class FireBaseOaut extends BaseActivity implements
                 @SuppressLint("StringFormatMatches")
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    String val = dataSnapshot.child(user.getUid()).child("access").getValue(String.class);
+
+                    new UserOaut().execute();
+                   /* String val = dataSnapshot.child(user.getUid()).child("access").getValue(String.class);
                     if (val != null) {
                         hideProgressDialog();
                         Intent intent = new Intent(getApplicationContext(), CompanyGet.class);
@@ -215,15 +208,7 @@ public class FireBaseOaut extends BaseActivity implements
                         hideProgressDialog();
                         Intent intent = new Intent(getApplicationContext(), NewUserActivity.class);
                         startActivity(intent);
-                        /*FirebaseUser user = mAuth.getCurrentUser();
-                        mStatusTextView.setText(getString(R.string.emailpassword_status_fmt,
-                                user.getEmail()));
-
-                        findViewById(R.id.emailPasswordButtons).setVisibility(View.GONE);
-                        findViewById(R.id.emailPasswordFields).setVisibility(View.GONE);
-                        findViewById(R.id.signedInButtons).setVisibility(View.VISIBLE);
-                        */
-                    }
+                    }*/
                 }
 
                 @Override
@@ -259,7 +244,6 @@ public class FireBaseOaut extends BaseActivity implements
     @SuppressLint("StaticFieldLeak")
     class UserOaut extends AsyncTask<String, String, String> {
 
-
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -269,17 +253,17 @@ public class FireBaseOaut extends BaseActivity implements
         protected String doInBackground(String... args) {
 
             // Создаем новый HashMap
-            HashMap<String, String> map = new HashMap<String, String>();
+            HashMap<String, String> map = new HashMap<>();
 
             map.put("uid", Objects.requireNonNull(mAuth.getCurrentUser()).getUid());
             Log.d("uid parsing:", Objects.requireNonNull(mAuth.getCurrentUser()).getUid());
 
             // получаем JSON строк с URL
 
-            JSONObject json = jsonParser.makeHttpRequest(url_get_company, "GET", map);
+            JSONObject json = jsonParser.makeHttpRequest(url_get_user, "GET", map);
 
 
-            Log.d("All Companies: ", json.toString());
+            Log.d("Есть ли пользователь: ", json.toString());
 
             try {
                 // Получаем SUCCESS тег для проверки статуса ответа сервера
@@ -289,41 +273,17 @@ public class FireBaseOaut extends BaseActivity implements
                     // продукт найден
                     // Получаем масив
                     Log.d("Status", "Success");
-                    /*userArray = json.getJSONArray(TAG_COMPANY);
+                    hideProgressDialog();
+                    Intent intent = new Intent(getApplicationContext(), CompanyGet.class);
+                    intent.putExtra("uid_user", Objects.requireNonNull(mAuth.getCurrentUser()).getUid());
+                    startActivity(intent);
 
-                    // перебор
-                    for (int i = 0; i < userArray.length(); i++) {
-                        JSONObject c = userArray.getJSONObject(i);
-                        String status = c.getString(TAG_STATUS);
-                        //System.out.println("Статус - "+status);
 
-                        if (status.equals("1")) {
-
-                            // Сохраняем каждый json элемент в переменную
-                            String id = c.getString(TAG_PID);
-                            String name = c.getString(TAG_COMPANY_NAME);
-                            //System.out.print(name + "\n");
-
-                            HashMap<String, String> map2list = new HashMap<String, String>();
-
-                            // добавляем каждый елемент в HashMap ключ => значение
-                            map2list.put(TAG_PID, id);
-                            map2list.put(TAG_COMPANY_NAME, name);
-
-                            // добавляем HashList в ArrayList
-                            userList.add(map2list);
-
-                        } //else //Toast.makeText(getApplicationContext(), "Нет доступных организаций", Toast.LENGTH_SHORT).show();
-                    }*/
                 } else {
-                    /*HashMap<String, String> map2list = new HashMap<String, String>();
-
-                    // добавляем каждый елемент в HashMap ключ => значение
-                    String name = json.getString(TAG_MESSAGE);
-                    map2list.put(TAG_COMPANY_NAME, name);
-                    // добавляем HashList в ArrayList
-                    userList.add(map2list);*/
                     Log.d("Status", "Unsuccess");
+                    hideProgressDialog();
+                    Intent intent = new Intent(getApplicationContext(), NewUserActivity.class);
+                    startActivity(intent);
                 }
 
             } catch (JSONException e) {
@@ -350,5 +310,14 @@ public class FireBaseOaut extends BaseActivity implements
                 }
             });*/
         }
+    }
+
+    public void onDestroy() {
+        moveTaskToBack(true);
+
+        super.onDestroy();
+
+        System.runFinalizersOnExit(true);
+        System.exit(0);
     }
 }

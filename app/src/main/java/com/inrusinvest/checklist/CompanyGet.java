@@ -33,7 +33,6 @@ public class CompanyGet extends AppCompatActivity {
     private static final String TAG_COMPANY = "company";
     private static final String TAG_PID = "id";
     private static final String TAG_COMPANY_NAME = "company_name";
-    private static final String TAG_STATUS = "status_comp";
     private static final String TAG_MESSAGE = "message";
     private static final String url_get_company = "http://46.149.225.24:8081/checklist/get_company.php";
     //private static final String url_get_company = "http://192.168.100.23:8081/checklist/get_company.php";
@@ -49,7 +48,7 @@ public class CompanyGet extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
-        companyList = new ArrayList<HashMap<String, String>>();
+        companyList = new ArrayList<>();
 
         lv = findViewById(R.id.parent_list_org);
         new GetCompany().execute();
@@ -69,7 +68,7 @@ public class CompanyGet extends AppCompatActivity {
 
         protected String doInBackground(String... args) {
 
-            HashMap<String, String> map = new HashMap<String, String>();
+            HashMap<String, String> map = new HashMap<>();
 
             String get_uid = null;
 
@@ -77,7 +76,7 @@ public class CompanyGet extends AppCompatActivity {
 
             if (arg != null) {
                 get_uid = arg.getString("uid_user");   // ПОЛУЧИЛ UID, далее в чеклист, далее в вопросы
-                map.put("uid", "\'"+get_uid+"\'");
+                map.put("uid", "\'" + get_uid + "\'");
             }
 
             final String put_uid = get_uid;
@@ -101,44 +100,41 @@ public class CompanyGet extends AppCompatActivity {
                     // перебор
                     for (int i = 0; i < company.length(); i++) {
                         JSONObject c = company.getJSONObject(i);
-                        String status = c.getString(TAG_STATUS);
                         //System.out.println("Статус - "+status);
 
-                        if (status.equals("1")) {
-                            // Сохраняем каждый json элемент в переменную
-                            String id = c.getString(TAG_PID);
-                            String name = c.getString(TAG_COMPANY_NAME);
-                            //System.out.print(name + "\n");
+                        // Сохраняем каждый json элемент в переменную
+                        String id = c.getString(TAG_PID);
+                        String name = c.getString(TAG_COMPANY_NAME);
+                        //System.out.print(name + "\n");
 
-                            HashMap<String, String> map2list = new HashMap<String, String>();
+                        HashMap<String, String> map2list = new HashMap<>();
 
-                            // добавляем каждый елемент в HashMap ключ => значение
-                            map2list.put(TAG_PID, id);
-                            map2list.put(TAG_COMPANY_NAME, name);
+                        // добавляем каждый елемент в HashMap ключ => значение
+                        map2list.put(TAG_PID, id);
+                        map2list.put(TAG_COMPANY_NAME, name);
 
-                            // добавляем HashList в ArrayList
-                            companyList.add(map2list);
+                        // добавляем HashList в ArrayList
+                        companyList.add(map2list);
 
-                            lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                                public void onItemClick(AdapterView<?> parent, View view,
-                                                        int position, long id) {
+                        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                            public void onItemClick(AdapterView<?> parent, View view,
+                                                    int position, long id) {
 
-                                    String pid = ((TextView) view.findViewById(R.id.pid)).getText()
-                                            .toString();
-                                    System.out.println(pid);
-                                    Intent intent = new Intent(CompanyGet.this, ChecklistGet.class);
-                                    intent.putExtra("company_id", pid);
-                                    intent.putExtra("uid_user", put_uid);
-                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                    startActivity(intent);
+                                String pid = ((TextView) view.findViewById(R.id.pid)).getText()
+                                        .toString();
+                                System.out.println(pid);
+                                Intent intent = new Intent(CompanyGet.this, ChecklistGet.class);
+                                intent.putExtra("company_id", pid);
+                                intent.putExtra("uid_user", put_uid);
+                                //intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                startActivity(intent);
 
-                                }
-                            });
+                            }
+                        });
 
-                        } //else //Toast.makeText(getApplicationContext(), "Нет доступных организаций", Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    HashMap<String, String> map2list = new HashMap<String, String>();
+                    HashMap<String, String> map2list = new HashMap<>();
 
                     // добавляем каждый елемент в HashMap ключ => значение
                     String name = json.getString(TAG_MESSAGE);
@@ -184,7 +180,6 @@ public class CompanyGet extends AppCompatActivity {
         switch (id) {
             case R.id.action_settings:
                 Intent intent = new Intent(this, SettsActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
                 return true;
             case R.id.action_about:

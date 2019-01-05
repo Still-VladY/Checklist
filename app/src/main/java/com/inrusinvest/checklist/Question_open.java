@@ -29,9 +29,10 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.io.InputStream;
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 
 public class Question_open extends AppCompatActivity {
@@ -52,17 +53,13 @@ public class Question_open extends AppCompatActivity {
 
     private static final String TAG_SUCCESS = "success";
     private static final String TAG_QUESTION = "question";
-    private static final String TAG_PID = "id";
     private static final String TAG_QUESTION_TEXT = "question_text";
-    private static final String TAG_STATUS = "status_quest";
     private static final String TAG_PHOTO_AVALIBLE = "photo_avalible";
     private static final String TAG_PHOTO = "photo";
     private static final String TAG_MESSAGE = "message";
     private static final String url_get_checklist = "http://46.149.225.24:8081/checklist/question_open.php";
     private static final String url_answer = "http://46.149.225.24:8081/checklist/put_answer.php";
 
-
-    private JSONArray question = null;
 
     private TextView tv;
 
@@ -121,8 +118,9 @@ public class Question_open extends AppCompatActivity {
 
     private void saveImage() {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        String currDate = DateFormat.getDateTimeInstance().format(new Date());
         File file = new File(Environment.getExternalStorageDirectory(),
-                "test.jpg");
+                get_uid+"_"+currDate);
         outputFileUri = Uri.fromFile(file);
         intent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
         startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
@@ -187,20 +185,18 @@ public class Question_open extends AppCompatActivity {
 
                 if (success == 1) {
                     // Получаем масив
-                    question = json.getJSONArray(TAG_QUESTION);
+                    JSONArray question = json.getJSONArray(TAG_QUESTION);
                     // перебор
                     for (int i = 0; i < question.length(); i++) {
 
                         JSONObject c = question.getJSONObject(i);
-                        String status = c.getString(TAG_STATUS);
 
-                        if (status.equals("1")) {
                             // Сохраняем каждый json элемент в переменную
                             //String id = c.getString(TAG_PID_CH);
                             String name = c.getString(TAG_QUESTION_TEXT);
                             String photoUrl = c.getString(TAG_PHOTO);
                             if (!photoUrl.equals("null")) {
-                                URL url = null;
+                                /*URL url = null;
                                 try {
                                     url = new URL(photoUrl);
                                 } catch (MalformedURLException e) {
@@ -208,7 +204,8 @@ public class Question_open extends AppCompatActivity {
                                 }
                                 assert url != null;
                                 Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-                                imagePhoto.setImageBitmap(bmp);
+                                imagePhoto.setImageBitmap(bmp);*/
+                                new DownloadImg(imagePhoto).execute(photoUrl);
                             }
 
                             photo = c.getString(TAG_PHOTO_AVALIBLE);
@@ -230,10 +227,14 @@ public class Question_open extends AppCompatActivity {
                                             goToQuestions();
                                             break;
                                         case "2":
-                                            alertDialog.show();
+                                            //alertDialog.show();
+                                            new GetAnswer().execute();
+                                            goToQuestions();
                                             break;
                                         case "3":
-                                            alertDialog.show();
+                                            //alertDialog.show();
+                                            new GetAnswer().execute();
+                                            goToQuestions();
                                             break;
                                     }
                                 }
@@ -249,19 +250,23 @@ public class Question_open extends AppCompatActivity {
                                             goToQuestions();
                                             break;
                                         case "1":
-                                            alertDialog.show();
+                                            //alertDialog.show();
+                                            new GetAnswer().execute();
+                                            goToQuestions();
                                             break;
                                         case "2":
                                             new GetAnswer().execute();
                                             goToQuestions();
                                             break;
                                         case "3":
-                                            alertDialog.show();
+                                            //alertDialog.show();
+                                            new GetAnswer().execute();
+                                            goToQuestions();
                                             break;
                                     }
                                 }
                             });
-                        }
+
                     }
                 } else {
 
@@ -269,7 +274,7 @@ public class Question_open extends AppCompatActivity {
                     String name = json.getString(TAG_MESSAGE);
                     tv.setText(name);
                 }
-            } catch (JSONException | IOException e) {
+            } catch (JSONException e) {
                 e.printStackTrace();
             }
 
@@ -313,27 +318,14 @@ public class Question_open extends AppCompatActivity {
 
             JSONObject json = jsonParser.makeHttpRequest(url_answer, "GET", map);
 
-            //Log.d("Все вопросы: ", json.toString());
-
             try {
                 // Получаем SUCCESS тег для проверки статуса ответа сервера
                 int success = json.getInt(TAG_SUCCESS);
 
 
                 if (success == 1) {
-                    // Получаем масив
-                    question = json.getJSONArray(TAG_QUESTION);
-                    // перебор
-                    for (int i = 0; i < question.length(); i++) {
+                    Log.d("Ответ - ", "Статус ОК");
 
-                        JSONObject c = question.getJSONObject(i);
-                        String status = c.getString(TAG_STATUS);
-
-                        if (status.equals("1")) {
-                            // Сохраняем каждый json элемент в переменную
-                            //String id = c.getString(TAG_PID_CH);
-                        }
-                    }
                 } else {
                     Log.d("ОШИБКА", "ОШИБКА, не 1");
                 }
@@ -349,6 +341,34 @@ public class Question_open extends AppCompatActivity {
         protected void onPostExecute(String file_url) {
             // закрываем прогресс диалог
             pDialog.end();
+        }
+    }
+
+
+    @SuppressLint("StaticFieldLeak")
+    private class DownloadImg extends AsyncTask<String, Void, Bitmap> {
+
+        ImageView imagePhoto;
+
+        private DownloadImg (ImageView imagePhoto) {
+            this.imagePhoto = imagePhoto;
+        }
+
+        protected Bitmap doInBackground(String... urls) {
+            String urldisplay = urls[0];
+            Bitmap mPhoto = null;
+            try {
+                InputStream in = new java.net.URL(urldisplay).openStream();
+                mPhoto = BitmapFactory.decodeStream(in);
+            } catch (Exception e) {
+                Log.d("Error open Photo", e.getMessage());
+                e.printStackTrace();
+            }
+            return mPhoto;
+        }
+
+        protected void onPostExecute(Bitmap result) {
+            imagePhoto.setImageBitmap(result);
         }
     }
 

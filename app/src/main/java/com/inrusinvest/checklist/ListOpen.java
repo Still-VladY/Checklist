@@ -33,9 +33,8 @@ public class ListOpen extends Activity {
     private static final String TAG_PID = "id";
     private static final String TAG_PID_QUEST = "id_qu";
     private static final String TAG_QUESTION_NAME = "question_name";
-    private static final String TAG_STATUS = "status_quest";
     private static final String TAG_MESSAGE = "message";
-    private static final String TAG_IFANSWER = "if_answer";
+    private static final String TAG_IF_ANSWER = "if_answer";
     private static final String url_get_checklist = "http://46.149.225.24:8081/checklist/get_question.php";
     private static final String url_open_checklist = "http://46.149.225.24:8081/checklist/run_ch.php";
     //private static final String url_get_checklist = "http://192.168.100.23:8081/checklist/get_question.php";
@@ -45,10 +44,21 @@ public class ListOpen extends Activity {
 
     ListView lv;
 
+    String get_ch_id;
+    String get_uid;
+    String get_comp_id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Bundle arg = getIntent().getExtras();
+        if (arg != null) {
+            get_ch_id = arg.getString("checklist_id");
+            get_uid = arg.getString("uid_user");
+            get_comp_id = arg.getString("company_id");
+        }
+
         setContentView(R.layout.activity_main);
         new RunChecklist().execute();
         questList = new ArrayList<>();
@@ -56,11 +66,6 @@ public class ListOpen extends Activity {
 
         lv = findViewById(R.id.parent_list_org);
     }
-
-
-    String get_ch_id;
-    String get_uid;
-    String get_comp_id;
 
     @SuppressLint("StaticFieldLeak")
     class GetQuestion extends AsyncTask<String, String, String> {
@@ -77,20 +82,10 @@ public class ListOpen extends Activity {
             // Создаем новый HashMap
             HashMap<String, String> map = new HashMap<>();
 
-
-
-            Bundle arg = getIntent().getExtras();
-            if (arg != null) {
-                get_ch_id = arg.getString("checklist_id");
-                get_uid = arg.getString("uid_user");
-                get_comp_id = arg.getString("company_id");
-
-
-                map.put("id", get_ch_id);
-                map.put("uid", "\'" + get_uid + "\'");
-                Log.d("ИД чеклиста в вопр: ", get_ch_id);
-                Log.d("ЮИД юзера в листах: ", get_uid);
-            }
+            map.put("id", get_ch_id);
+            map.put("uid", "\'" + get_uid + "\'");
+            Log.d("ИД чеклиста в вопр: ", get_ch_id);
+            Log.d("ЮИД юзера в листах: ", get_uid);
 
             // получаем JSON строк с URL
 
@@ -112,14 +107,13 @@ public class ListOpen extends Activity {
                     for (int i = 0; i < question.length(); i++) {
 
                         JSONObject c = question.getJSONObject(i);
-                        String status = c.getString(TAG_STATUS);
-                        String if_answer = c.getString(TAG_IFANSWER);
+                        //String if_answer = c.getString(TAG_IF_ANSWER);
 
-                        if (status.equals("1")) {
                             // Сохраняем каждый json элемент в переменную
                             //String id = c.getString(TAG_PID_CH);
                             String id = c.getString(TAG_PID_QUEST);
                             String name = c.getString(TAG_QUESTION_NAME);
+
 
                             Log.d("Вопросы - ", name);
 
@@ -137,7 +131,7 @@ public class ListOpen extends Activity {
                             lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                                 public void onItemClick(AdapterView<?> parent, View view,
                                                         int position, long id) {
-                                    String pid = ((TextView) view.findViewById(R.id.pid)).getText()
+                                    String pid = ((TextView) view.findViewById(R.id.pid_img)).getText()
                                             .toString();
                                     Log.d("Выбранный id вопроса:", pid);
                                     Log.d("Выбранный id чеклиста: ", get_ch_id);
@@ -146,11 +140,10 @@ public class ListOpen extends Activity {
                                     intent.putExtra("checklist_id", get_ch_id);
                                     intent.putExtra("user_uid", get_uid);
                                     intent.putExtra("company_id", get_comp_id);
-                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                    //intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                     startActivity(intent);
                                 }
                             });
-                        }
                     }
                 } else {
                     HashMap<String, String> map2list = new HashMap<String, String>();
@@ -178,9 +171,9 @@ public class ListOpen extends Activity {
 
                     ListAdapter adapter = new SimpleAdapter(
                             ListOpen.this, questList,
-                            R.layout.list_item, new String[]{TAG_PID,
+                            R.layout.list_item_img, new String[]{TAG_PID,
                             TAG_QUESTION_NAME},
-                            new int[]{R.id.pid, R.id.name});
+                            new int[]{R.id.pid_img, R.id.name_img});
                     // обновляем listview
                     lv.setAdapter(adapter);
 
@@ -196,7 +189,7 @@ public class ListOpen extends Activity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            pDialog.run(ListOpen.this);
+            //pDialog.run(ListOpen.this);
         }
 
         @SuppressLint("SetTextI18n")
@@ -204,13 +197,13 @@ public class ListOpen extends Activity {
             // Создаем новый HashMap
             HashMap<String, String> map = new HashMap<>();
 
-                map.put("uid", "\'"+get_uid+"\'");
-                map.put("id_ch", "\'"+get_ch_id+"\'");
-                map.put("comp_id", "\'"+get_comp_id+"\'");
+            map.put("uid", "\'" + get_uid + "\'");
+            map.put("id_ch", "\'" + get_ch_id + "\'");
+            map.put("comp_id", "\'" + get_comp_id + "\'");
 
-                Log.d("Чеклист Ран ид юзера: ", get_uid);
-                Log.d("Чеклист Ран ид комп: ", get_comp_id);
-                Log.d("Чеклист Ран ид чек", get_ch_id);
+            Log.d("Чеклист Ран ид юзера: ", get_uid);
+            Log.d("Чеклист Ран ид комп: ", get_comp_id);
+            Log.d("Чеклист Ран ид чек", get_ch_id);
 
 
             // получаем JSON строк с URL
@@ -227,19 +220,7 @@ public class ListOpen extends Activity {
 
 
                 if (success == 1) {
-                    // Получаем масив
-                    question = json.getJSONArray(TAG_QUESTION);
-                    // перебор
-                    for (int i = 0; i < question.length(); i++) {
-
-                        JSONObject c = question.getJSONObject(i);
-                        String status = c.getString(TAG_STATUS);
-
-                        if (status.equals("1")) {
-                            // Сохраняем каждый json элемент в переменную
-                            //String id = c.getString(TAG_PID_CH);
-                        }
-                    }
+                    Log.d("Чеклист ран: ",  "Статус ОК");
                 } else {
                     Log.d("ОШИБКА", "ОШИБКА, не 1");
                 }
@@ -251,9 +232,9 @@ public class ListOpen extends Activity {
             return null;
         }
 
-        protected void onPostExecute(String file_url) {
+        protected void onPostExecute(String file_url) { // ДАЛЕЕ - ПОМЕТКА ЧТО ВОПРОС ОТВЕЧЕН
             // закрываем прогресс диалог
-            pDialog.end();
+            // pDialog.end();
         }
     }
 

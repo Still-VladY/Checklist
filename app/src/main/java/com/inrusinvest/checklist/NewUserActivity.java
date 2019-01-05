@@ -131,6 +131,9 @@ public class NewUserActivity extends AppCompatActivity implements
 
                 if (success == 1) {
                     Log.d("Status", "Success");
+                    /*DatabaseReference db = FirebaseDatabase.getInstance().getReference("users");
+                    db.setValue(user.getUid()).;
+                    db.child(user.getUid()).setValue("")*/
                     Intent intent = new Intent(NewUserActivity.this, CompanyGet.class);
                     intent.putExtra("uid_user", Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid());
                     startActivity(intent);
