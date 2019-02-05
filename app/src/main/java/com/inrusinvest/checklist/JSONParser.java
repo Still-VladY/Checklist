@@ -53,6 +53,8 @@ public class JSONParser {
 
                 conn.setDoOutput(true);
 
+                conn.setDoInput(true);
+
                 conn.setRequestMethod("POST");
 
                 conn.setRequestProperty("Accept-Charset", charset);

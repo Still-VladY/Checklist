@@ -40,6 +40,7 @@ public class ChecklistGet extends AppCompatActivity {
     JSONArray checklist = null;
 
     ListView lv;
+    String get_uid = null;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,7 +69,6 @@ public class ChecklistGet extends AppCompatActivity {
             HashMap<String, String> map = new HashMap<>();
 
             String get_comp_id = null;
-            String get_uid = null;
             Bundle arg = getIntent().getExtras();
             if (arg != null) {
                 get_comp_id = arg.getString("company_id");
@@ -165,5 +165,13 @@ public class ChecklistGet extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(ChecklistGet.this, CompanyGet.class);
+        intent.putExtra("uid_user", get_uid);
+        startActivity(intent);
+        finish();
     }
 }

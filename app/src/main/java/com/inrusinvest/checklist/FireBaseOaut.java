@@ -17,11 +17,6 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -190,32 +185,7 @@ public class FireBaseOaut extends BaseActivity implements
 
         if (user != null) {
             showProgressDialog();
-
-            DatabaseReference db = FirebaseDatabase.getInstance().getReference("users");
-            db.addValueEventListener(new ValueEventListener() {
-                @SuppressLint("StringFormatMatches")
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                    new UserOaut().execute();
-                   /* String val = dataSnapshot.child(user.getUid()).child("access").getValue(String.class);
-                    if (val != null) {
-                        hideProgressDialog();
-                        Intent intent = new Intent(getApplicationContext(), CompanyGet.class);
-                        intent.putExtra("uid_user", Objects.requireNonNull(mAuth.getCurrentUser()).getUid());
-                        startActivity(intent);
-                    } else {
-                        hideProgressDialog();
-                        Intent intent = new Intent(getApplicationContext(), NewUserActivity.class);
-                        startActivity(intent);
-                    }*/
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            });
+            new UserOaut().execute();
 
         } else {
             mStatusTextView.setText(R.string.signed_out);
@@ -296,19 +266,6 @@ public class FireBaseOaut extends BaseActivity implements
         protected void onPostExecute(String file_url) {
             // закрываем прогресс диалог
             //pDialog.end();
-            // обновляем UI форму в фоновом потоке
-            /*runOnUiThread(new Runnable() {
-                public void run() {
-
-                    ListAdapter adapter = new SimpleAdapter(
-                            CompanyGet.this, companyList,
-                            R.layout.list_item, new String[]{TAG_PID,
-                            TAG_COMPANY_NAME},
-                            new int[]{R.id.pid, R.id.name});
-                    // обновляем listview
-                    lv.setAdapter(adapter);
-                }
-            });*/
         }
     }
 

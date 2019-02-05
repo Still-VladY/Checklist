@@ -16,6 +16,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <provider
+            android:name=".GenericFileProvider"
+            android:authorities="${applicationId}.com.inrusinvest.checklist.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths"/>
+        </provider>
         <activity
             android:name=".CompanyGet"
             android:screenOrientation="portrait" />
@@ -26,15 +35,19 @@
         <activity
             android:name=".FireBaseOaut"
             android:screenOrientation="portrait">
+        </activity>
+        <activity android:name=".SettsActivity" />
+        <activity android:name=".NewUserActivity" />
+        <activity android:name=".Question_open"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".StartAcrivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SettsActivity" />
-        <activity android:name=".NewUserActivity"></activity>
-        <activity android:name=".Question_open"></activity>
     </application>
 
 </manifest>
